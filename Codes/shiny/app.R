@@ -4,7 +4,7 @@ library(shiny)
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Let's calculate your body fat percentage!"),
+    titlePanel(h1("Let's calculate your body fat percentage!", align = "center")),
 
     # Sidebar for users to input their information
     sidebarLayout(
@@ -17,18 +17,32 @@ ui <- fluidPage(
                          min = 1.0, max = 1.1,
                          step = 0.001),
             
+            numericInput(inputId = "age",
+                         label = "Please input your age:",
+                         value = NULL,
+                         min = 1, max = 122,
+                         step = 1),
+            
             numericInput(inputId = "weight",
                          label = "Please input your weight:",
                          value = NULL,
                          min = 10, max = 300,
+                         step = 1),
+            
+            numericInput(inputId = "height",
+                         label = "Please input your height:",
+                         value = NULL,
+                         min = 18, max = 90,
                          step = 1)
         ),
 
         # Show the result
         mainPanel(
+            img(src = "panda.png", height = 300, width = 300),
+            br(),
             "Your estimated body fat percentage is:",
             #textOutput("text"),
-            textOutput("bodyFat")
+            textOutput("bodyFat"),
         )
     )
 )
