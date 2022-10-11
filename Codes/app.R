@@ -13,13 +13,15 @@ ui <- fluidPage(
             
             numericInput(inputId = "density", 
                          label = "Please input your body density:",
-                         value = 1.0,
-                         min = 1.0, max = 1.1),
+                         value = NULL,
+                         min = 1.0, max = 1.1,
+                         step = 0.001),
             
             numericInput(inputId = "weight",
                          label = "Please input your weight:",
-                         value = 150,
-                         min = 10, max = 300)
+                         value = NULL,
+                         min = 10, max = 300,
+                         step = 1)
         ),
 
         # Show the result
