@@ -5,44 +5,59 @@ ui <- fluidPage(
 
     # Application title
     titlePanel(h1("Let's calculate your body fat percentage!", align = "center")),
+    br(),
+    
+    #img(src = "panda.png", height = 300, width = 300),
+    #img(src = "cat.png", height = 300, width = 300),
 
     # Sidebar for users to input their information
     sidebarLayout(
         
         sidebarPanel(
             
-            numericInput(inputId = "density", 
-                         label = "Please input your body density:",
-                         value = NULL,
-                         min = 1.0, max = 1.1,
-                         step = 0.001),
-            
-            numericInput(inputId = "age",
+            numericInput(inputId = "age", 
                          label = "Please input your age:",
                          value = NULL,
                          min = 1, max = 122,
                          step = 1),
             
-            numericInput(inputId = "weight",
-                         label = "Please input your weight:",
+            numericInput(inputId = "adiposity",
+                         label = "Please input your adiposity:",
                          value = NULL,
-                         min = 10, max = 300,
-                         step = 1),
+                         min = 10, max = 40,
+                         step = 0.1),
             
-            numericInput(inputId = "height",
-                         label = "Please input your height:",
+            numericInput(inputId = "abdomen",
+                         label = "Please input your abdomen:",
                          value = NULL,
-                         min = 18, max = 90,
-                         step = 1)
+                         min = 70, max = 130,
+                         step = 0.1),
+            
+            numericInput(inputId = "wrist",
+                         label = "Please input your wrist:",
+                         value = NULL,
+                         min = 10, max = 25,
+                         step = 0.1),
+            
+            div(actionButton("calculate", label = "Calculate", 
+                             style="color: #fff; background-color: #337ab7; border-color: #2e6da4;"), 
+                align = "center")
+                
         ),
 
         # Show the result
         mainPanel(
-            img(src = "panda.png", height = 300, width = 300),
-            br(),
-            "Your estimated body fat percentage is:",
-            #textOutput("text"),
-            textOutput("bodyFat"),
+            tabsetPanel(
+                
+                tabPanel("Result",
+                         br(),
+                         #br(),
+                         "Your estimated body fat percentage is:",
+                         textOutput("bodyFat")),
+                
+                tabPanel("Graph")
+                
+            )
         )
     )
 )
@@ -50,11 +65,10 @@ ui <- fluidPage(
 # Define server logic required to calculate users' body fat
 server <- function(input, output) {
     
-    #output$text = 
-    
     output$bodyFat = renderText({
-        input$weight / (10 * input$density)
+        input$age / (10 * input$abdomen)
     })
+    
 }
 
 # Run the application 
