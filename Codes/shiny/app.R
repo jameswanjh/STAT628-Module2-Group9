@@ -64,11 +64,11 @@ ui <- fluidPage(
 
 # Define server logic required to calculate users' body fat
 server <- function(input, output) {
-    
-    output$bodyFat = renderText({
-        input$age / (10 * input$abdomen)
+    observeEvent(input$calculate, {
+        output$bodyFat = renderText({
+            input$age / (10 * input$abdomen)
+        })
     })
-    
 }
 
 # Run the application 
