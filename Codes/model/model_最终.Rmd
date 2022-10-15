@@ -19,7 +19,7 @@ library(RColorBrewer)
 ```
 
 ```{r}
-fat <- read.csv(file = "/Users/yujiacheng/Desktop/628/STAT628-Module2-Group9/Data/df11.csv",header=T)
+fat <- read.csv(file = "Data/df11.csv",header=T)
 fat=fat[,-1]
 head(fat)
 ```
@@ -83,24 +83,24 @@ fat_first<-fat[,c(1,2,5,6,8,10,15)]
 #fat_first
 
 #五个变量的多重共线性
-kappa(fat_first,,exact=TRUE)
+kappa(fat_first,exact=TRUE)
 fitmodel1<-lm(Y~.,data = fat_first)
 fitmodel1
 vif_fat1<-vif(fitmodel1)
 vif_fat1
 cor_data1<-cor(fat_first)
-kappa(cor_data1,,exact=TRUE)
+kappa(cor_data1,exact=TRUE)
 eigen(cor_data1)
 
 fat_sec<-fat[,c(1,2,5,6,8,15)]
 #fat_first
-kappa(fat_sec,,exact=TRUE)
+kappa(fat_sec,exact=TRUE)
 fitmodel2<-lm(Y~.,data = fat_sec)
 fitmodel2
 vif_fat2<-vif(fitmodel2)
 vif_fat2
 cor_data2<-cor(fat_sec)
-kappa(cor_data2,,exact=TRUE)
+kappa(cor_data2,exact=TRUE)
 eigen(cor_data2)
 ```
 ```{r}
