@@ -1,0 +1,66 @@
+---
+title: "model_final"
+author: "Jiacheng"
+date: "2022-10-16"
+output: html_document
+---
+```{r}
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+library(colorspace)
+library(corrplot)
+library(ggpubr)
+library(ggalt) 
+library(car)
+library(nlme)
+library(reshape2)
+library(RColorBrewer)
+```
+
+```{r}
+fat <- read.csv(file = "/Users/yujiacheng/Desktop/628/STAT628-Module2-Group9/Data/df1_v2.csv",header=T)
+#fat <- fat %>% mutate(category=cut(AGE, breaks=c(-Inf, 30,40,50,60,70, Inf), labels=c("20-30","30-40","40-50","50-60","60-70","70+")))
+fat=fat[,-1]
+head(fat)
+```
+
+```{r}
+colnames(fat) <- c("Y","X2","X3","X4","X5","X6","X7","X8","X9","X10","X11","X12","X13","X14","X15")
+head(fat)
+```
+
+```{r}
+# Linear regression of the full model (non-significant variables without variable selection are also included in the model, weight and height are removed)
+mlr1 <- lm(Y ~ X2 + X5 + X6 + X7 + X8 + X9 + X10 + X11 + X12 + X13 + X14 + X15 , fat)
+summary(mlr1)
+mean(mlr1$residuals^2)
+# Initial screening (regression method) results for the remaining variables
+mlr2 <- lm(Y ~ X2 + X5 + X6 + X7 + X8 + X9 +  X15 , fat)
+summary(mlr2)
+mean(mlr2$residuals^2)
+#X2 variables are not in the model and in the model anova test
+mlr3 <- lm(Y ~ X5 + X6 + X7 + X8 + X9 +  X15 , fat)
+summary(mlr3)
+mean(mlr3$residuals^2)
+anova(mlr3,mlr2)
+#X6 variables not in the model and in the model anova test
+mlr4 <- lm(Y ~ X2+ X5  + X7 + X8 + X9 +  X15 , fat)
+summary(mlr4)
+mean(mlr4$residuals^2)
+anova(mlr4,mlr2)
+# leaved 5 variables
+mlr5 <- lm(Y ~ X5  + X7 + X8 + X9 +  X15 , fat)
+summary(mlr5)
+mean(mlr5$residuals^2)
+
+
+mlr6 <- lm(Y ~ X8 +  X15 , fat)
+summary(mlr6)
+mean(mlr6$residuals^2)
+
+mlr7 <- lm(Y ~ X8 , fat)
+summary(mlr7)
+mean(mlr7$residuals^2)
+```
+
