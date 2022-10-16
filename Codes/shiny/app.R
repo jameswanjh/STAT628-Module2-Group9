@@ -1,7 +1,12 @@
 library(shiny)
+library(bslib)
 
 # Define UI for application that calculates users' body fat
 ui <- fluidPage(
+    theme = bs_theme(version = 4, bootswatch = "minty",
+                     base_font = font_google("Space Mono"),
+                     code_font = font_google("Space Mono")),
+    
 
     # Application title
     titlePanel(h1("Let's calculate your body fat percentage!", align = "center")),
@@ -14,33 +19,42 @@ ui <- fluidPage(
     sidebarLayout(
         
         sidebarPanel(
-            
-            numericInput(inputId = "age", 
-                         label = "Please input your age:",
-                         value = NULL,
-                         min = 1, max = 122,
-                         step = 1),
+            "Please help us learn more about you...",
+            br(),
+            br(),
             
             numericInput(inputId = "adiposity",
-                         label = "Please input your adiposity:",
+                         label = "Adiposity (bmi):",
                          value = NULL,
-                         min = 10, max = 40,
+                         min = 13, max = 60,
                          step = 0.1),
+            
+            numericInput(inputId = "chest", 
+                         label = "Chest circumference (cm):",
+                         value = NULL,
+                         min = 50, max = 130,
+                         step = 1),
             
             numericInput(inputId = "abdomen",
-                         label = "Please input your abdomen:",
+                         label = "Abdominal circumference (cm):",
                          value = NULL,
-                         min = 70, max = 130,
-                         step = 0.1),
+                         min = 23, max = 130,
+                         step = 1),
+            
+            numericInput(inputId = "hip",
+                         label = "Hip circumference (cm):",
+                         value = NULL,
+                         min = 50, max = 130,
+                         step = 1),
             
             numericInput(inputId = "wrist",
-                         label = "Please input your wrist:",
+                         label = "Wrist circumference (cm):",
                          value = NULL,
-                         min = 10, max = 25,
-                         step = 0.1),
+                         min = 10, max = 22,
+                         step = 1),
             
             div(actionButton("calculate", label = "Calculate", 
-                             style="color: #fff; background-color: #337ab7; border-color: #2e6da4;"), 
+                             style="color: #fff; background-color: #76b5c5; border-color: #abdbe3;"), 
                 align = "center")
                 
         ),
@@ -48,14 +62,14 @@ ui <- fluidPage(
         # Show the result
         mainPanel(
             tabsetPanel(
+                type = "pills",
                 
                 tabPanel("Result",
                          br(),
-                         #br(),
                          "Your estimated body fat percentage is:",
                          textOutput("bodyFat")),
                 
-                tabPanel("Graph")
+                tabPanel("Details")
                 
             )
         )
@@ -67,7 +81,7 @@ server <- function(input, output) {
     output$bodyFat = renderText({
         input$calculate
         req(input$calculate)
-        isolate(input$age / (10 * input$abdomen))
+        isolate(0.73329*input$adiposity - 0.29203*input$chest + 0.84434*input$abdomen - 0.29645*input$hip - 1.77567*input$wrist + 13.69886)
     })
 }
 
