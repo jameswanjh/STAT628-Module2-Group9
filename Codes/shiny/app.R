@@ -15,9 +15,6 @@ ui <- fluidPage(
     # Application title
     titlePanel(h1("Let's calculate your body fat percentage!", align = "center")),
     br(),
-    
-    #img(src = "panda.png", height = 300, width = 300),
-    #img(src = "cat.png", height = 300, width = 300),
 
     # Sidebar for users to input their information
     sidebarLayout(
@@ -82,6 +79,21 @@ ui <- fluidPage(
                 
             )
         )
+    ),
+    
+    br(),
+    br(),
+    br(),
+    
+    fluidRow(
+        column(12, 
+               br(),
+               p("If you have any question about this body fat calculator, please feel free to contact us by E-mail."),
+               "For questions or problems about this web app, please contact: ", strong("jwan23@wisc.edu"), br(),
+               "For questions or problems about our data and model, please contact: ", 
+               strong("jyu386@wisc.edu "), "| ", strong("kma57@wisc.edu "), "| ", strong("xhao33@wisc.edu")
+               ),
+        style = "background-color:#eeeee4; height:150px;"
     )
 )
 
@@ -153,7 +165,7 @@ server <- function(input, output) {
     
     output$boxplot = renderPlot({
         # Horizontal box plot
-        boxplot(df$BODYFAT, xlab = "Body Fat Percentage",col = "white", horizontal = TRUE, outline = FALSE)
+        boxplot(df$BODYFAT, xlab = "Body Fat Percentage", main = "See where you are in the distribution of our dataset", col = "white", horizontal = TRUE, outline = FALSE)
         
         # Point
         stripchart(c(estimate()), pch = 19, col = "#EF9A9A", cex = 2, add = TRUE) 
