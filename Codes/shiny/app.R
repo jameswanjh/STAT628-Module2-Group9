@@ -57,33 +57,43 @@ ui <- fluidPage(
             
             div(actionButton("calculate", label = "Calculate", 
                              style="color: #fff; background-color: #76b5c5; border-color: #abdbe3;"), 
-                align = "center")
-                
+                align = "center"),
         ),
-
+        
         # Show the result
         mainPanel(
+            br(),
+            
             tabsetPanel(
                 type = "pills",
                 
                 tabPanel("Result",
                          br(),
                          "Your estimated body fat percentage is:",
-                         textOutput("bodyFat")
+                         textOutput("bodyFat"),
+                         br(),
+                         hr(),
+                         textOutput("description"),
+                         br(),
+                         tableOutput("interval")
                          ),
                 
                 tabPanel("Details",
                          plotOutput("boxplot"),
                          verbatimTextOutput("summary")
                          )
-                
-            )
+            ),
         )
     ),
     
     br(),
-    br(),
-    br(),
+
+    fluidRow(
+        column(12, 
+               br(),
+        ),
+        style = "height:25vh;",
+    ),
     
     fluidRow(
         column(12, 
@@ -93,7 +103,7 @@ ui <- fluidPage(
                "For questions or problems about our data and model, please contact: ", 
                strong("jyu386@wisc.edu "), "| ", strong("kma57@wisc.edu "), "| ", strong("xhao33@wisc.edu")
                ),
-        style = "background-color:#eeeee4; height:150px;"
+        style = "background-color:#eeeee4; height:175px;",
     )
 )
 
@@ -142,7 +152,10 @@ server <- function(input, output) {
         }
             
         # Calculate users' body fat
-        result = 0.73329*input$adiposity - 0.29203*input$chest + 0.84434*input$abdomen - 0.29645*input$hip - 1.77567*input$wrist + 13.69886
+        model = lm(BODYFAT ~ ADIPOSITY + CHEST + ABDOMEN + HIP + WRIST, data = df)
+        userInput = data.frame(ADIPOSITY = c(input$adiposity), CHEST = c(input$chest), ABDOMEN = c(input$abdomen), HIP = c(input$hip), WRIST = c(input$wrist))
+        prediction = predict(model, newdata = userInput, interval = "prediction", level = 0.95)
+        result = prediction[1]
         
         # Check the result
         if (result < 2 || result > 50) {
@@ -153,29 +166,48 @@ server <- function(input, output) {
                 Thank you!",
                 size = "l"
             ))
+            FALSE
         } else {
-            result
+            prediction
         }
     })
     
     # Display the result
     output$bodyFat = renderText({
-        estimate()
+        req(is.numeric(estimate()[1]))
+        estimate()[1]
     })
     
+    output$description = renderText({
+        req(is.numeric(estimate()[1]))
+        "Your body fat percentage is within the interval:"
+    })
+    
+    
+    output$interval = renderTable({
+        req(is.numeric(estimate()[1]))
+        data.frame(LowerBound = c(estimate()[2]), UpperBound = c(estimate()[3]), Level = c("95%"))
+        },
+                                  align = "c")
+    
     output$boxplot = renderPlot({
+        req(is.numeric(estimate()[1]))
         # Horizontal box plot
         boxplot(df$BODYFAT, xlab = "Body Fat Percentage", main = "See where you are in the distribution of our dataset", col = "white", horizontal = TRUE, outline = FALSE)
         
         # Point
-        stripchart(c(estimate()), pch = 19, col = "#EF9A9A", cex = 2, add = TRUE) 
+        stripchart(c(estimate()[1]), pch = 19, col = "#EF9A9A", cex = 2, add = TRUE)
+        stripchart(c(estimate()[2]), pch = 25, col = "#1e81b0", cex = 2, add = TRUE)
+        stripchart(c(estimate()[3]), pch = 24, col = "#1e81b0", cex = 2, add = TRUE)
     })
     
     output$summary = renderText({
+        req(is.numeric(estimate()[1]))
         paste("Mean: 18.972             High: 43.314                    Low: 1.423", "\n",
               "Median: 19.210           Upper Quartile: 24.622          Lower Quartile: 12.982", "\n",
               "\n",
-              "Your estimated body fat percentage ", estimate(), " is indicated by the pink point in the plot above.",
+              "Your estimated body fat percentage ", round(estimate()[1], 5), " is indicated by the pink circle in the plot above.", "\n",
+              "The 95% prediction interval bounds of your body fat percentage [", round(estimate()[2], 5), ", ",round(estimate()[3], 5), "] are indicated by the blue triangles.",
                sep = "")
     })
 }
