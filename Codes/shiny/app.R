@@ -1,8 +1,10 @@
 library(shiny)
 library(bslib)
+library(shinyvalidate)
 
 # Define UI for application that calculates users' body fat
 ui <- fluidPage(
+    # UI theme
     theme = bs_theme(version = 4, bootswatch = "minty",
                      base_font = font_google("Space Mono"),
                      code_font = font_google("Space Mono")),
@@ -18,6 +20,7 @@ ui <- fluidPage(
     # Sidebar for users to input their information
     sidebarLayout(
         
+        # Prompts for users' input
         sidebarPanel(
             "Please help us learn more about you...",
             br(),
@@ -78,10 +81,41 @@ ui <- fluidPage(
 
 # Define server logic required to calculate users' body fat
 server <- function(input, output) {
+    # Validate users' input
+    iv = InputValidator$new()
+    iv$add_rule("adiposity", sv_required())
+    iv$add_rule("adiposity", sv_numeric())
+    iv$add_rule("adiposity", sv_between(13, 60))
+    iv$add_rule("chest", sv_required())
+    iv$add_rule("chest", sv_numeric())
+    iv$add_rule("chest", sv_between(50, 130))
+    iv$add_rule("abdomen", sv_required())
+    iv$add_rule("abdomen", sv_numeric())
+    iv$add_rule("abdomen", sv_between(23, 130))
+    iv$add_rule("hip", sv_required())
+    iv$add_rule("hip", sv_numeric())
+    iv$add_rule("hip", sv_between(50, 130))
+    iv$add_rule("wrist", sv_required())
+    iv$add_rule("wrist", sv_numeric())
+    iv$add_rule("wrist", sv_between(10, 22))
+    
+    # Click the button to get results
+    estimate = eventReactive(input$calculate, {
+        iv$enable()
+        
+        req(iv$is_valid())
+        iv$disable()
+        
+        # Calculate users' body fat
+        result = 0.73329*input$adiposity - 0.29203*input$chest + 0.84434*input$abdomen - 0.29645*input$hip - 1.77567*input$wrist + 13.69886
+        })
+    
+    # Display the result
     output$bodyFat = renderText({
-        input$calculate
-        req(input$calculate)
-        isolate(0.73329*input$adiposity - 0.29203*input$chest + 0.84434*input$abdomen - 0.29645*input$hip - 1.77567*input$wrist + 13.69886)
+        validate(
+            need(result <= 50, message = "Adiposity must be within the range of 13~60 bmi")
+        )
+        estimate()
     })
 }
 
