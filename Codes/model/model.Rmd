@@ -19,7 +19,7 @@ library(RColorBrewer)
 ```
 
 ```{r}
-fat <- read.csv(file = "/Users/yujiacheng/Desktop/628/BodyFat.csv",header=T)
+fat <- read.csv(file = "E:/WISC/Fall 2022/STAT 628/STAT628-Module2-Group9/Data/df1_v2.csv",header=T)
 fat=fat[,-1]
 head(fat)
 ```
@@ -36,14 +36,15 @@ legend("topright", col =brewer.pal(3, "RdGy")[fat$AGE_class],
        legend = c("22-40", "41-60","61-81"))
 
 ```
+
 ```{r}
-kappa(fat,,exact=TRUE)
+kappa(fat,exact=TRUE)
 fitmodel<-lm(BODYFAT~.,data = fat)
 fitmodel
 vif_fat<-vif(fitmodel)
 vif_fat
 cor_data<-cor(fat)
-kappa(cor_data,,exact=TRUE)
+kappa(cor_data,exact=TRUE)
 eigen(cor_data)
 ```
 
@@ -67,12 +68,12 @@ polygon(d2,col="dark grey",border="light green")#对数变换后的BODYFAT的直
 
 
 ```{r}
-colnames(fat) <- c("Y","X1","X2","X3","X4","X5","X6","X7","X8","X9","X10","X11","X12","X13","X14","X15")
+colnames(fat) <- c("Y","X2","X3","X4","X5","X6","X7","X8","X9","X10","X11","X12","X13","X14","X15")
 ```
 
 ```{r}
 # 全模型的线性回归(还没有变量选择的不显著的变量也在模型里面)
-mlr <- lm(Y ~ X2 + X3 +X4+ X5 + X6 + X7 + X8 + X9 + X10 + X11 + X12 + X13 + X14 + X15, fat)
+mlr <- lm( X5 ~ X2 + X3 +X4 + X6 + X7 + X8 + X9 + X10 + X11 + X12 + X13 + X14 + X15, fat)
 summary(mlr)
 summary(aov(mlr))
 plot(rstandard(mlr)~fitted(mlr),xlab='y_fit',ylab = 'y.rst',main='fit')
@@ -83,7 +84,7 @@ confint(mlr)
 ```
 ```{r}
 # 全模型的线性回归(还没有变量选择的不显著的变量也在模型里面)
-mlr2 <- lm(Y ~ X2 +  X6 + X8 + X14 + X15, fat)
+mlr2 <- lm(Y ~ X2 +  X6 + X8 + X10 + X15, fat)
 summary(mlr2)
 summary(aov(mlr2))
 plot(rstandard(mlr2)~fitted(mlr2),xlab='y_fit',ylab = 'y.rst',main='fit')
@@ -95,13 +96,13 @@ fat_first<-fat[,c(1,3,7,9,15,16)]
 fat_first
 
 #五个变量的多重共线性
-kappa(fat_first,,exact=TRUE)
+kappa(fat_first,exact=TRUE)
 fitmodel1<-lm(Y~.,data = fat_first)
 fitmodel1
 vif_fat1<-vif(fitmodel1)
 vif_fat1
 cor_data1<-cor(fat_first)
-kappa(cor_data1,,exact=TRUE)
+kappa(cor_data1,exact=TRUE)
 eigen(cor_data1)
 ```
 ```{r}
@@ -116,9 +117,10 @@ a2
 ```
 ```{r}
 #逐步回归（对全模型的向前和向后回归）
-mlr.step = lm(Y ~ X2 +  X6 + X8 + X14 + X15, fat_first)
+mlr.step = lm(Y ~ X2 +X5+  X6 + X8 + X10 + X15, fat)
+summary(mlr.step)$adj.r.squared
 step(mlr.step, direction = "backward")
-step(mlr.step, direction = "forward")
+step(mlr.step, direction = "both")
 ```
 
 
@@ -146,11 +148,30 @@ BIC(lm(Y ~ X2 + X8 + X15 + X6 + X14, fat_first))
 ```{r}
 model1<-lm(Y ~ X2 + X8 + X15, fat_first)
 model2<-lm(Y ~ X2 + X8 + X15 + X6, fat_first)
-model3<-lm(Y ~ X2 + X8 + X15 + X14, fat_first)
-model4<-lm(Y ~ X2 + X8 + X15 + X6 + X14, fat_first)
+model3<-lm(Y ~ X2 + X8 + X15 , fat_first)
+model4<-lm(Y ~ X2 + X5 + X6 + X8 + X15, fat)
+model5<-lm(Y ~ X2 + X5 +X8 + X15, fat)
+
+
+anova(model5,model4)
+
+plot(model5)
+
+par(mfrow = c(1, 1))
+# Independence
+plot(resid(mlr3))+abline(h=0)
+# Normality
+qqnorm(rstandard(mlr3))
+# Linearity
+plot(fat$Y, rstandard(mlr3)) +
+abline(h = 0)
+# Variance / Heteroscedasticity
+plot(rstandard(mlr3)) +
+abline(h = 0)
+
 summary(model1)$adj.r.squared
 summary(model2)$adj.r.squared
-summary(model3)$adj.r.squared
+summary(model5)$adj.r.squared
 summary(model4)$adj.r.squared
 
 model_sum1 <-summary(model1)
