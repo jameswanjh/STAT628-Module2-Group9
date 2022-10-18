@@ -19,7 +19,7 @@ library(RColorBrewer)
 ```
 
 ```{r}
-fat <- read.csv(file = "/Users/yujiacheng/Desktop/628/STAT628-Module2-Group9/Data/df1_v2.csv",header=T)
+fat <- read.csv(file = "Data/df1_v2.csv",header=T)
 #fat <- fat %>% mutate(category=cut(AGE, breaks=c(-Inf, 30,40,50,60,70, Inf), labels=c("20-30","30-40","40-50","50-60","60-70","70+")))
 fat=fat[,-1]
 head(fat)

@@ -19,7 +19,7 @@ library(RColorBrewer)
 ```
 
 ```{r}
-fat <- read.csv(file = "/Users/yujiacheng/Desktop/628/BodyFat.csv",header=T)
+fat <- read.csv(file = "Data/BodyFat.csv",header=T)
 fat=fat[,-1]
 head(fat)
 ```
