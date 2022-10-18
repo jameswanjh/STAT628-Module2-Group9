@@ -1,0 +1,81 @@
+---
+title: "Bodyfat Dataset"
+author: "Kaiyan Ma"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    css: "custom.css"
+---
+```{r, include=FALSE}
+library(dplyr)
+library(corrplot)
+library(car)
+```
+
+# Reading Data
+```{r}
+df <- read.csv("Bodyfat.csv")
+df <- df[,-1] %>% mutate(category=cut(AGE, breaks=c(-Inf, 30,40,50,60,70, Inf), labels=c("20-30","30-40","40-50","50-60","60-70","70+")))
+
+df
+```
+
+
+# Recalculate bodyfat with density
+```{r}
+par(mfrow=c(2,1))
+
+plot(df$DENSITY,df$BODYFAT,pch = 16, cex = 0.5, col = "blue",main = "Before",xlab = "DENSITY",ylab = "BODYFAT")
+
+lmz1 <- lm(BODYFAT~DENSITY,df)
+
+abline(lmz1,col="red")
+
+df$BODYFAT<- lmz1$fitted.values
+plot(df$DENSITY,df$BODYFAT,pch = 16, cex = 0.5, col = "blue",main = "After",xlab = "DENSITY",ylab = "BODYFAT")
+
+df <- df[,c(-2)]
+```
+
+
+```{r}
+df1 <- df[,c(-16)] 
+
+boxplot(df1)
+```
+
+```{r}
+full.model1 <- lm(BODYFAT ~., data = df1)
+# X: Leverage point: point with unusual combination of the independent variables
+# Y: Student residual: 
+#Circle: Cook's distance
+influencePlot(full.model1)
+
+summary(full.model1)
+```
+
+
+```{r}
+df[c(42,39,224,96),]
+
+summary(df)
+```
+
+
+```{r}
+# height 29.5
+df1[42,'HEIGHT'] <-  69.5 #recalculate with bmi and weight 
+
+# bodyfat 6.13 lower than similar people
+df1[224,'BODYFAT'] <-  mean(df[df$BODYFAT <9 & df$ADIPOSITY <23 & df$ADIPOSITY >21 & df$AGE>40,1])  #mean of similar people
+
+# bodyfat 1.42 lower than similar people
+df1[96,'ADIPOSITY'] <-  mean(df[df$BODYFAT>2 & df$ABDOMEN <100 & df$ABDOMEN > 98 & df$ADIPOSITY <27 & df$ADIPOSITY >25 & df$AGE>40,1])
+
+# 39: weight 363.15... tall & super strong, outlier __delete
+# 182: bodyfat=0 (before recalculate) super skinny __delete
+df1 <- df1[c(-39,-182),]
+
+write.csv(df1,'df1.csv')
+```
+
