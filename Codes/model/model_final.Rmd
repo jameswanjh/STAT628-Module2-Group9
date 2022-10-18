@@ -19,7 +19,7 @@ library(RColorBrewer)
 ```
 
 ```{r}
-fat <- read.csv(file = "E:/WISC/Fall 2022/STAT 628/STAT628-Module2-Group9/Data/df1_v2.csv",header=T)
+fat <- read.csv(file = "/Users/yujiacheng/Desktop/628/STAT628-Module2-Group9/Data/df1_v2.csv",header=T)
 #fat <- fat %>% mutate(category=cut(AGE, breaks=c(-Inf, 30,40,50,60,70, Inf), labels=c("20-30","30-40","40-50","50-60","60-70","70+")))
 fat=fat[,-1]
 head(fat)
@@ -44,6 +44,12 @@ mlr3 <- lm(Y ~ X5 + X6 + X7 + X8 + X9 +  X15 , fat)
 summary(mlr3)
 mean(mlr3$residuals^2)
 anova(mlr3,mlr2)
+
+# Hypothesis test (for insignificant variable X2)
+linearHypothesis(mlr2,c(0,1,0,0,0,0,0,0),rhs = c(0))
+a1=aov(Y ~ X2 + X5 + X6 + X7 + X8 + X9 +  X15 , fat)
+a1
+
 #X6 variables not in the model and in the model anova test
 mlr4 <- lm(Y ~ X2+ X5  + X7 + X8 + X9 +  X15 , fat)
 summary(mlr4)
@@ -54,31 +60,68 @@ mlr5 <- lm(Y ~ X5  + X7 + X8 + X9 +  X15 , fat)
 summary(mlr5)
 mean(mlr5$residuals^2)
 
-mlr5 <- lm(Y ~ X5  + X7 + X8 + X9 +  X15 , fat)
-summary(mlr5)
-mean(mlr5$residuals^2)
-
-mlr6 <- lm(Y ~ X8 +  X15 , fat)
+# leaved 5 variables
+mlr6 <- lm(Y ~ X5  + X7 + X8 + X9 +  X15 , fat)
 summary(mlr6)
 mean(mlr6$residuals^2)
 
-mlr7 <- lm(Y ~ X8 , fat)
+fat_1<-fat[,c(1,5,7,8,9,15)]
+fat_1
+kappa(fat_1,exact=TRUE)
+fitmodel1<-lm(Y~.,data = fat_1)
+fitmodel1
+vif_fat1<-vif(fitmodel1)
+vif_fat1
+cor_data1<-cor(fat_1)
+kappa(cor_data1,exact=TRUE)
+eigen(cor_data1)
+
+# remove X5
+mlr7 <- lm(Y ~  X7 + X8 + X9 +  X15 , fat)
 summary(mlr7)
 mean(mlr7$residuals^2)
-```
-## check assumptions
-```{r}
-plot(mlr5)
-par(mfrow = c(1, 1))
-# Independence
-plot(resid(lm(BODYFAT~ADIPOSITY+CHEST+ABDOMEN+HIP+WRIST, data=fat)), type = "l")
-# Normality
-plot(lm(BODYFAT~ADIPOSITY+CHEST+ABDOMEN+HIP+WRIST, data=fat),2)
-# Linearity
-plot(lm(BODYFAT~ADIPOSITY+CHEST+ABDOMEN+HIP+WRIST, data=fat),1)
-# Variance / Heteroscedasticity
-plot(rstandard(lm(BODYFAT~ADIPOSITY+CHEST+ABDOMEN+HIP+WRIST, data=fat))) +
-abline(h = 0)
-```
 
+fat_2<-fat[,c(1,7,8,9,15)]
+fat_2
+kappa(fat_2,exact=TRUE)
+fitmodel2<-lm(Y~.,data = fat_2)
+fitmodel2
+vif_fat2<-vif(fitmodel2)
+vif_fat2
+cor_data2<-cor(fat_2)
+kappa(cor_data2,exact=TRUE)
+eigen(cor_data2)
+
+# remove X7
+mlr8 <- lm(Y ~ X5  + X8 + X9 +  X15 , fat)
+summary(mlr8)
+mean(mlr8$residuals^2)
+
+fat_3<-fat[,c(1,5,8,9,15)]
+fat_3
+kappa(fat_3,exact=TRUE)
+fitmodel3<-lm(Y~.,data = fat_3)
+fitmodel3
+vif_fat3<-vif(fitmodel3)
+vif_fat3
+cor_data3<-cor(fat_3)
+kappa(cor_data3,exact=TRUE)
+eigen(cor_data3)
+
+# remove X9
+mlr9 <- lm(Y ~ X5  + X7 + X8 +  X15 , fat)
+summary(mlr9)
+mean(mlr9$residuals^2)
+
+fat_4<-fat[,c(1,7,8,5,15)]
+fat_4
+kappa(fat_4,exact=TRUE)
+fitmodel4<-lm(Y~.,data = fat_4)
+fitmodel4
+vif_fat4<-vif(fitmodel4)
+vif_fat4
+cor_data4<-cor(fat_4)
+kappa(cor_data4,exact=TRUE)
+eigen(cor_data4)
+```
 
