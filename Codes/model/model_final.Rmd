@@ -66,7 +66,7 @@ mlr7 <- lm(Y ~ X8 , fat)
 summary(mlr7)
 mean(mlr7$residuals^2)
 ```
-## Plot
+## check assumptions
 ```{r}
 plot(mlr5)
 par(mfrow = c(1, 1))
