@@ -53,13 +53,10 @@ anova(mlr4,mlr2)
 mlr5 <- lm(Y ~ X5  + X7 + X8 + X9 +  X15 , fat)
 summary(mlr5)
 mean(mlr5$residuals^2)
-step(mlr5,direction = "both")
 
 mlr5 <- lm(Y ~ X5  + X7 + X8 + X9 +  X15 , fat)
 summary(mlr5)
 mean(mlr5$residuals^2)
-
-car::boxCox(mlr5)
 
 mlr6 <- lm(Y ~ X8 +  X15 , fat)
 summary(mlr6)
@@ -71,22 +68,17 @@ mean(mlr7$residuals^2)
 ```
 ## Plot
 ```{r}
-plot(mlr5,1)
+plot(mlr5)
 par(mfrow = c(1, 1))
 # Independence
 plot(resid(lm(BODYFAT~ADIPOSITY+CHEST+ABDOMEN+HIP+WRIST, data=fat)), type = "l")
 # Normality
-qqnorm(rstandard(mlr5))
+plot(lm(BODYFAT~ADIPOSITY+CHEST+ABDOMEN+HIP+WRIST, data=fat),2)
 # Linearity
-plot(fat$Y, rstandard(mlr5)) +
-abline(h = 0)
-
 plot(lm(BODYFAT~ADIPOSITY+CHEST+ABDOMEN+HIP+WRIST, data=fat),1)
 # Variance / Heteroscedasticity
 plot(rstandard(lm(BODYFAT~ADIPOSITY+CHEST+ABDOMEN+HIP+WRIST, data=fat))) +
 abline(h = 0)
-
-plot(lm(BODYFAT~ADIPOSITY+CHEST+ABDOMEN+HIP+WRIST, data=fat),3)
 ```
 
 
